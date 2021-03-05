@@ -1,5 +1,20 @@
-img {
-  width: 10%;
-  height: auto;
+html 
+{
+ overflow: auto;
 }
-.signup-footer.jsx-876516464{padding:96px;display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;-webkit-flex-direction:column;-ms-flex-direction:column;flex-direction:column;background-color:var(--color-background-3);}.header.jsx-876516464{font-size:36px;font-weight:500;color:var(--color-white);text-align:center;padding-bottom:calc(var(--padding-size-large) * 1.5);}.content-wrapper.jsx-876516464{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;-webkit-flex-direction:column;-ms-flex-direction:column;flex-direction:column;width:100%;max-width:750px;}.button-wrapper.jsx-876516464{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-box-pack:center;-webkit-justify-content:center;-ms-flex-pack:center;justify-content:center;}a.jsx-876516464{padding:0 !important;-webkit-text-decoration:none !important;text-decoration:none !important;}@media only screen and (max-width:480px){.signup-footer.jsx-876516464{padding:32px;}}</style><style id="__jsx-2037466755">div.jsx-2037466755 .react-select{color:red;}.footer.jsx-2037466755{position:relative;display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-flex-direction:column;-ms-flex-direction:column;flex-direction:column;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;background:#f2f2f3;padding:50px 5% 15px;}.footerLinksWrapper.jsx-2037466755{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-box-pack:center;-webkit-justify-content:center;-ms-flex-pack:center;justify-content:center;width:100%;max-width:800px;margin:0 auto 35px;}.languagesWrapper.jsx-2037466755{width:70%;margin:0 auto 35px;text-align:center;}.footerLinksWrapper.jsx-2037466755,.footerLinksWrapper.jsx-2037466755 a.jsx-2037466755,.languagesWrapper.jsx-2037466755,.languagesWrapper.jsx-2037466755 a.jsx-2037466755{color:#807f7f;}.footerLinksWrapper.jsx-2037466755 h4.jsx-2037466755,.languagesWrapper.jsx-2037466755 h4.jsx-2037466755{margin-bottom:20px;}.footerLinksWrapper.jsx-2037466755 .footerLinks.jsx-2037466755>div.jsx-2037466755>a.jsx-2037466755,.languagesWrapper.jsx-2037466755 .langLinks.jsx-2037466755 a.jsx-2037466755{margin-bottom:5px;font-size:14px;display:block;-webkit-text-decoration:none;text-decoration:none;}.footerLinksWrapper.jsx-2037466755 .footerLinks.jsx-2037466755{margin:0 10px;}.footerLinksWrapper.jsx-2037466755 a.jsx-2037466755:hover,.languagesWrapper.jsx-2037466755 a.jsx-2037466755:hover{color:rgb(81,146,179);-webkit-text-decoration:none;text-decoration:none;}.languagesWrapper.jsx-2037466755 .langLinks.jsx-2037466755{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-flex-direction:column;-ms-flex-direction:column;flex-direction:column;-webkit-flex-wrap:wrap;-ms-flex-wrap:wrap;flex-wrap:wrap;height:210px;-webkit-align-items:flex-start;-webkit-box-align:flex-start;-ms-flex-align:flex-start;align-items:flex-start;}#copyright.jsx-2037466755{color:rgba(128,127,127,0.7);font-size:14px;}@media all and (max-width:900px){.footer.jsx-2037466755{position:relative;}.footerLinksWrapper.jsx-2037466755{-webkit-flex-direction:column;-ms-flex-direction:column;flex-direction:column;}.languagesWrapper.jsx-2037466755{margin:0;width:100%;text-align:left;}.languagesWrapper.jsx-2037466755 .langLinks.jsx-2037466755{height:auto;width:auto;}.languagesWrapper.jsx-2037466755 h4.jsx-2037466755,.footerLinksWrapper.jsx-2037466755 h4.jsx-2037466755{margin-top:22px;margin-bottom:16;font-size:24px;}.footerLinksWrapper.jsx-2037466755 .footerLinks.jsx-2037466755>div.jsx-2037466755>a.jsx-2037466755,.languagesWrapper.jsx-2037466755 .langLinks.jsx-2037466755 a.jsx-2037466755{margin-bottom:15px;font-size:20px;}}.footer.jsx-2037466755 a.jsx-2037466755{cursor:pointer;}
+ 
+html, body, div, iframe 
+{
+ margin: 0px; 
+ padding: 0px; 
+ height: 100%; 
+ border: none;
+}
+iframe 
+{
+ display: block; 
+ width: 100%; 
+ border: none; 
+ overflow-y: auto; 
+ overflow-x: hidden;
+}
