@@ -1,0 +1,15 @@
+{
+    "blog" : {
+        "id": "3423232",
+        "user" : {
+            "id": "23143"
+            "name": "Jimmy Carter",
+            "username": "JimmyC"
+        },
+        "title": "Being me",
+        "description": "How to be a president",
+        "modified": "2009-03-17T03:53:36Z",
+        "published": true,
+        "tags": ["president", "usa", "john", "quincy", "adams"]
+    }
+}
