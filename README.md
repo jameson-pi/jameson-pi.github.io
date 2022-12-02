@@ -1,4 +1,3 @@
 # My portfolio
-**jameson**
 
-*jameson*
+## this is my ***portfolio***
