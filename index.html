@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pathfinding Visualizer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            overscroll-behavior: none;
+        }
+        .controls-card {
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        canvas {
+            cursor: pointer;
+            touch-action: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-200 flex flex-col md:flex-row h-screen antialiased">
+
+    <!-- Controls Panel -->
+    <div class="w-full md:w-80 lg:w-96 bg-gray-900/80 controls-card p-6 shadow-2xl overflow-y-auto order-2 md:order-1 flex-shrink-0">
+        <h1 class="text-2xl font-bold text-white mb-2">Pathfinding Visualizer</h1>
+        <p class="text-sm text-gray-400 mb-6">Click and drag to draw walls. Visualize the algorithm step-by-step.</p>
+
+        <div class="space-y-4">
+            <!-- Grid Settings -->
+            <div>
+                <h2 class="text-lg font-semibold text-gray-300 mb-3">Grid Settings</h2>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="width" class="block text-sm font-medium text-gray-400">Width</label>
+                        <input type="number" id="width" value="15" class="mt-1 block w-full bg-gray-700 border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label for="height" class="block text-sm font-medium text-gray-400">Height</label>
+                        <input type="number" id="height" value="15" class="mt-1 block w-full bg-gray-700 border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Coordinate Settings -->
+            <div>
+                <h2 class="text-lg font-semibold text-gray-300 mb-3">Coordinates</h2>
+                 <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-400">Start (X, Y)</label>
+                        <div class="flex gap-2">
+                           <input type="number" id="startX" value="2" class="mt-1 block w-full bg-gray-700 border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                           <input type="number" id="startY" value="7" class="mt-1 block w-full bg-gray-700 border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-400">End (X, Y)</label>
+                        <div class="flex gap-2">
+                            <input type="number" id="endX" value="12" class="mt-1 block w-full bg-gray-700 border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <input type="number" id="endY" value="7" class="mt-1 block w-full bg-gray-700 border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="pt-4 space-y-3">
+                <button id="resetBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all duration-200 ease-in-out">
+                    Apply Settings & Reset
+                </button>
+                <button id="stepBtn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all duration-200 ease-in-out">
+                    Next Step (Explore)
+                </button>
+                 <button id="runBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all duration-200 ease-in-out">
+                    Run to Completion
+                </button>
+            </div>
+        </div>
+
+        <!-- Status & Instructions -->
+        <div class="mt-8">
+             <h2 class="text-lg font-semibold text-gray-300 mb-3">Status</h2>
+             <div id="status" class="bg-gray-800 rounded-lg p-3 text-sm text-gray-300 min-h-[60px]">Ready. Click a cell to create a wall, then press 'Next Step'.</div>
+        </div>
+        
+        <div class="mt-6">
+             <h2 class="text-lg font-semibold text-gray-300 mb-3">Legend</h2>
+             <div class="grid grid-cols-2 gap-2 text-sm">
+                <div class="flex items-center"><div class="w-4 h-4 rounded-sm bg-green-500 mr-2"></div>Start</div>
+                <div class="flex items-center"><div class="w-4 h-4 rounded-sm bg-red-500 mr-2"></div>End</div>
+                <div class="flex items-center"><div class="w-4 h-4 rounded-sm bg-gray-700 mr-2"></div>Empty</div>
+                <div class="flex items-center"><div class="w-4 h-4 rounded-sm bg-sky-400 mr-2"></div>Explored</div>
+                <div class="flex items-center"><div class="w-4 h-4 rounded-sm bg-gray-600 mr-2"></div>Wall</div>
+                <div class="flex items-center"><div class="w-4 h-4 rounded-sm bg-purple-500/50 border border-purple-400 mr-2"></div>Final Path</div>
+                <div class="flex items-center col-span-2"><span class="font-mono text-xs bg-gray-800 px-1 rounded-sm mr-2">12.3</span>Cell f_score</div>
+             </div>
+        </div>
+    </div>
+
+    <!-- Canvas Container -->
+    <div class="flex-grow p-4 order-1 md:order-2 flex items-center justify-center">
+        <canvas id="gridCanvas" class="bg-gray-800 rounded-lg shadow-2xl"></canvas>
+    </div>
+
+    <script>
+        // --- Core Logic (from Python code) ---
+
+        /**
+         * Represents a single cell in the grid.
+         */
+        class Cell {
+            constructor(x, y, filled = false, explored = false) {
+                this.x = x;
+                this.y = y;
+                this.filled = filled; // Is it a wall?
+                this.explored = explored; // Has the algorithm visited it?
+                this.parent = null; // Used to reconstruct the final path
+            }
+
+            // Calculate Euclidean distance to another cell
+            distance(other) {
+                if (other instanceof Cell) {
+                    return Math.sqrt((this.x - other.x) ** 2 + (this.y - other.y) ** 2);
+                }
+                throw new TypeError("Distance can only be calculated between two Cell instances");
+            }
+
+            // A* f_score: g_score (distance from start) + h_score (heuristic distance to end)
+            f_score(start, end) {
+                // This is not a standard A* f_score, but matches the provided Python logic.
+                // g_score would typically be this.distance(start), and h_score would be this.distance(end)
+                return this.distance(start) + this.distance(end);
+            }
+        }
+
+        /**
+         * Represents the entire grid and manages the pathfinding state.
+         */
+        class Grid {
+            constructor(width, height, startCoords, endCoords) {
+                this.width = width;
+                this.height = height;
+                this.cells = Array.from({ length: width }, (_, x) => 
+                    Array.from({ length: height }, (_, y) => new Cell(x, y))
+                );
+
+                // Clamp coordinates to be within bounds
+                const clamp = (val, max) => Math.max(0, Math.min(val, max - 1));
+                startCoords.x = clamp(startCoords.x, width);
+                startCoords.y = clamp(startCoords.y, height);
+                endCoords.x = clamp(endCoords.x, width);
+                endCoords.y = clamp(endCoords.y, height);
+                
+                this.start = this.cells[startCoords.x][startCoords.y];
+                this.end = this.cells[endCoords.x][endCoords.y];
+            }
+
+            getCell(x, y) {
+                if (x >= 0 && x < this.width && y >= 0 && y < this.height) {
+                    return this.cells[x][y];
+                }
+                return null; // Return null instead of throwing an error for easier handling
+            }
+
+            // Calculate score for a cell, returning a high value if invalid
+            getExplorationScore(x, y) {
+                const cell = this.getCell(x, y);
+                if (cell && !cell.explored && !cell.filled) {
+                    return cell.f_score(this.start, this.end);
+                }
+                return Infinity; // Use Infinity for a very high score
+            }
+
+            // Find the best neighbor of a given cell
+            exploreNeighbors(cell) {
+                let lowestScore = Infinity;
+                let bestNeighbor = null;
+
+                for (let dx = -1; dx <= 1; dx++) {
+                    for (let dy = -1; dy <= 1; dy++) {
+                        if (dx === 0 && dy === 0) continue; // Skip the cell itself
+
+                        const neighborX = cell.x + dx;
+                        const neighborY = cell.y + dy;
+                        const neighbor = this.getCell(neighborX, neighborY);
+
+                        if (neighbor) {
+                            const score = this.getExplorationScore(neighbor.x, neighbor.y);
+                            if (score < lowestScore) {
+                                lowestScore = score;
+                                bestNeighbor = neighbor;
+                            }
+                        }
+                    }
+                }
+                return { bestNeighbor, lowestScore };
+            }
+
+            // Perform one step of the exploration algorithm
+            explore() {
+                let overallLowestScore = Infinity;
+                let cellToExplore = null;
+                let parentCell = null;
+
+                // On the very first step, the only "explored" cell to consider is the start
+                if (!this.start.explored) {
+                     this.start.explored = true;
+                     return this.start;
+                }
+
+                // Iterate through all cells to find the ones already explored
+                for (let x = 0; x < this.width; x++) {
+                    for (let y = 0; y < this.height; y++) {
+                        const currentCell = this.cells[x][y];
+                        if (currentCell.explored && !currentCell.filled) {
+                            // For each explored cell, find its best valid neighbor
+                            const { bestNeighbor, lowestScore } = this.exploreNeighbors(currentCell);
+
+                            // Check if this neighbor is the best one we've found in this entire step
+                            if (bestNeighbor && lowestScore < overallLowestScore) {
+                                overallLowestScore = lowestScore;
+                                cellToExplore = bestNeighbor;
+                                parentCell = currentCell; // Remember which cell found this best neighbor
+                            }
+                        }
+                    }
+                }
+                
+                if (cellToExplore) {
+                    cellToExplore.explored = true;
+                    cellToExplore.parent = parentCell; // Link for path reconstruction
+                }
+                
+                return cellToExplore;
+            }
+        }
+
+        // --- Visualization Logic ---
+        const canvas = document.getElementById('gridCanvas');
+        const ctx = canvas.getContext('2d');
+        const statusEl = document.getElementById('status');
+        
+        // Input elements
+        const widthInput = document.getElementById('width');
+        const heightInput = document.getElementById('height');
+        const startXInput = document.getElementById('startX');
+        const startYInput = document.getElementById('startY');
+        const endXInput = document.getElementById('endX');
+        const endYInput = document.getElementById('endY');
+
+        // Buttons
+        const resetBtn = document.getElementById('resetBtn');
+        const stepBtn = document.getElementById('stepBtn');
+        const runBtn = document.getElementById('runBtn');
+        
+        let grid;
+        let cellSize;
+        let lastExplored = null;
+        let pathFound = false;
+        let runningInterval = null;
+        let isDragging = false;
+        let lastToggledCell = null;
+
+
+        function setup() {
+            if (runningInterval) {
+                clearInterval(runningInterval);
+                runningInterval = null;
+            }
+
+            const width = parseInt(widthInput.value, 10) || 15;
+            const height = parseInt(heightInput.value, 10) || 15;
+            const startCoords = { x: parseInt(startXInput.value, 10), y: parseInt(startYInput.value, 10) };
+            const endCoords = { x: parseInt(endXInput.value, 10), y: parseInt(endYInput.value, 10) };
+
+            grid = new Grid(width, height, startCoords, endCoords);
+            lastExplored = null;
+            pathFound = false;
+            
+            // Adjust canvas to fit container
+            const container = canvas.parentElement;
+            const containerSize = Math.min(container.clientWidth - 10, container.clientHeight - 10);
+            cellSize = Math.floor(containerSize / Math.max(width, height));
+            canvas.width = width * cellSize;
+            canvas.height = height * cellSize;
+
+            statusEl.textContent = "Grid reset. Click or drag to create walls.";
+            stepBtn.disabled = false;
+            runBtn.disabled = false;
+            drawGrid();
+        }
+
+        function drawGrid() {
+            if (!grid) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            for (let x = 0; x < grid.width; x++) {
+                for (let y = 0; y < grid.height; y++) {
+                    const cell = grid.getCell(x, y);
+                    let color = '#374151'; // Unexplored color (gray-700)
+                    
+                    if(cell.filled) {
+                        color = '#4b5563'; // Wall color (gray-600)
+                    } else if (cell.explored) {
+                        color = '#38bdf8'; // Explored color (sky-400)
+                    }
+                    
+                    if (cell === grid.start) {
+                        color = '#22c55e'; // Start color (green-500)
+                    } else if (cell === grid.end) {
+                        color = '#ef4444'; // End color (red-500)
+                    }
+                    
+                    ctx.fillStyle = color;
+                    ctx.fillRect(x * cellSize, y * cellSize, cellSize - 1, cellSize - 1);
+                    
+                    // --- DISPLAY F_SCORE (CONDITIONALLY) ---
+                    let isNeighborOfExplored = false;
+                    if (!cell.explored) {
+                        for (let dx = -1; dx <= 1; dx++) {
+                            for (let dy = -1; dy <= 1; dy++) {
+                                if (dx === 0 && dy === 0) continue;
+                                const neighbor = grid.getCell(x + dx, y + dy);
+                                if (neighbor && neighbor.explored) {
+                                    isNeighborOfExplored = true;
+                                    break;
+                                }
+                            }
+                            if (isNeighborOfExplored) break;
+                        }
+                    }
+
+                    if (!cell.filled && cellSize > 25 && (cell.explored || isNeighborOfExplored)) {
+                        const score = cell.f_score(grid.start, grid.end);
+                        ctx.fillStyle = cell.explored ? '#111827' : '#d1d5db'; // Darker text for explored, lighter for neighbors
+                        const fontSize = Math.max(8, Math.floor(cellSize / 4.5));
+                        ctx.font = `${fontSize}px Inter`;
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        
+                        ctx.fillText(
+                            score.toFixed(1), 
+                            x * cellSize + cellSize / 2, 
+                            y * cellSize + cellSize / 2
+                        );
+                    }
+                }
+            }
+
+            if (pathFound) {
+                drawPath();
+            }
+        }
+        
+        function drawPath() {
+             let current = grid.end;
+             if (!current) return;
+             
+             ctx.beginPath();
+             ctx.moveTo(current.x * cellSize + cellSize / 2, current.y * cellSize + cellSize / 2);
+
+             while (current && current.parent) {
+                 current = current.parent;
+                 ctx.lineTo(current.x * cellSize + cellSize / 2, current.y * cellSize + cellSize / 2);
+             }
+             ctx.strokeStyle = '#a855f7'; // Path color (purple-500)
+             ctx.lineWidth = Math.max(2, cellSize / 8);
+             ctx.stroke();
+        }
+
+        function step() {
+            if (pathFound || !grid) return;
+
+            const exploredCell = grid.explore();
+            lastExplored = exploredCell;
+
+            if (exploredCell) {
+                statusEl.textContent = `Explored cell at (${exploredCell.x}, ${exploredCell.y}).`;
+                if (exploredCell === grid.end) {
+                    pathFound = true;
+                    statusEl.textContent = `Path found! Click grid to reset.`;
+                    stepBtn.disabled = true;
+                    runBtn.disabled = true;
+                    if(runningInterval) clearInterval(runningInterval);
+                }
+            } else {
+                statusEl.textContent = "No further cells can be explored. Path blocked.";
+                stepBtn.disabled = true;
+                runBtn.disabled = true;
+                if(runningInterval) clearInterval(runningInterval);
+            }
+
+            drawGrid();
+        }
+        
+        function runSimulation() {
+            if (runningInterval || pathFound) return;
+            stepBtn.disabled = true;
+            runBtn.disabled = true;
+            
+            runningInterval = setInterval(() => {
+                step();
+                 if (pathFound || !lastExplored) {
+                    clearInterval(runningInterval);
+                    runningInterval = null;
+                    if (!pathFound) {
+                       stepBtn.disabled = false;
+                       runBtn.disabled = false;
+                    }
+                 }
+            }, 100);
+        }
+
+        function getCellFromEvent(event) {
+            if (!grid) return null;
+            const rect = canvas.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+
+            const gridX = Math.floor(x / cellSize);
+            const gridY = Math.floor(y / cellSize);
+            
+            return grid.getCell(gridX, gridY);
+        }
+
+        function toggleWall(cell) {
+            if (cell && cell !== grid.start && cell !== grid.end) {
+                cell.filled = !cell.filled;
+                pathFound = false; 
+                stepBtn.disabled = false;
+                runBtn.disabled = false;
+                statusEl.textContent = "Wall toggled. Ready to explore.";
+                drawGrid();
+            }
+        }
+        
+        // --- Event Handlers for Wall Drawing ---
+        canvas.addEventListener('mousedown', (e) => {
+            if (pathFound) {
+                setup();
+                return;
+            }
+            
+            isDragging = true;
+            const cell = getCellFromEvent(e);
+            if(cell) {
+                toggleWall(cell);
+                lastToggledCell = cell;
+            }
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (!isDragging || pathFound) return;
+            
+            const cell = getCellFromEvent(e);
+            if (cell && cell !== lastToggledCell) {
+                 toggleWall(cell);
+                 lastToggledCell = cell;
+            }
+        });
+        
+        // Stop dragging if mouse leaves canvas or button is released anywhere
+        window.addEventListener('mouseup', () => {
+            isDragging = false;
+            lastToggledCell = null;
+        });
+
+        canvas.addEventListener('mouseleave', () => {
+             isDragging = false;
+             lastToggledCell = null;
+        });
+
+
+        // Other Event Listeners
+        resetBtn.addEventListener('click', setup);
+        stepBtn.addEventListener('click', step);
+        runBtn.addEventListener('click', runSimulation);
+        window.addEventListener('resize', setup);
+
+        // Initial setup
+        window.onload = setup;
+    </script>
+</body>
+</html>
